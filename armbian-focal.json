@@ -1,0 +1,79 @@
+{
+  "variables": {
+    "ssh_user": "user",
+    "ssh_key": "ssh-ed25519 XXXXXXXXXXXXXXXXXXXXXX user"
+  },
+  "builders": [
+    {
+      "type": "arm",
+      "file_urls": [
+        "https://mirrors.netix.net/armbian/dl/zeropi/archive/Armbian_20.08_Zeropi_focal_current_5.7.15.img.xz"
+      ],
+      "file_checksum_url": "https://mirrors.netix.net/armbian/dl/zeropi/archive/Armbian_20.08_Zeropi_focal_current_5.7.15.img.xz.sha",
+      "file_checksum_type": "sha256",
+      "file_target_extension": "xz",
+      "file_unarchive_cmd": [
+        "xz",
+        "--decompress",
+        "$ARCHIVE_PATH"
+      ],
+      "image_build_method": "resize",
+      "image_path": "armbian-focal-zeropi.img",
+      "image_size": "2G",
+      "image_type": "dos",
+      "image_partitions": [
+        {
+          "name": "root",
+          "type": "83",
+          "start_sector": "8192",
+          "filesystem": "ext4",
+          "size": "0",
+          "mountpoint": "/"
+        }
+      ],
+      "image_chroot_env": [
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+      ],
+      "image_mount_path": "/tmp/packer-zeropi",
+      "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
+      "qemu_binary_destination_path": "/usr/bin/qemu-arm-static"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p /tmp/packer"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./files/",
+      "destination": "/tmp/packer"
+    },
+    {
+      "type": "shell-local",
+      "scripts": [
+        "scripts/local-systemd.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/update.sh",
+        "scripts/sshd.sh",
+        "scripts/unattended-upgrades.sh",
+        "scripts/software.sh",
+        "scripts/user.sh",
+        "scripts/networking.sh",
+        "scripts/cleanup.sh"
+      ],
+      "environment_vars": [
+        "LANGUAGE=en_US.UTF-8",
+        "LC_ALL=en_US.UTF-8",
+        "PACKER_USER={{user `ssh_user`}}",
+        "PACKER_SSH_KEY={{user `ssh_key`}}"
+      ]
+    }
+  ]
+}

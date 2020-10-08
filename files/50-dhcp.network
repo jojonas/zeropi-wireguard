@@ -1,0 +1,7 @@
+[Match]
+Name=eth*
+
+[Network]
+DHCP=ipv4
+MulticastDNS=yes
+LLMNR=yes

@@ -1,0 +1,5 @@
+mnt/
+packer_cache/
+*.img
+*.log
+.envrc

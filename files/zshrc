@@ -1,0 +1,8 @@
+# this basic .zshrc prevents the zsh-newuser-install script from running
+
+autoload -Uz compinit promptinit
+
+compinit
+promptinit
+
+PROMPT='%m%# '
